@@ -1,0 +1,17 @@
+{
+  "name": "grade-ai",
+  "version": "1.0.0",
+  "description": "Sleek AI-Powered Exam Grader & Evaluator",
+  "scripts": {
+    "dev": "npx -y http-server -p 3000"
+  },
+  "keywords": [
+    "ai",
+    "grading",
+    "ocr",
+    "gemini",
+    "education"
+  ],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GradeAI - Sleek AI-Powered Exam Grader & Evaluator</title>
+  
+  <!-- Modern Fonts from Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Architects+Daughter&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS is avoided per guidelines, using standard CSS variables and glassmorphism -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- API Key & Mode Notice Banner -->
+  <div id="demo-banner" class="demo-banner">
+    <div class="banner-content">
+      <span class="pulse-dot"></span>
+      <strong>Demo Mode Active:</strong> Using high-fidelity pre-graded papers. To use your own student sheets with live OCR, configure your <button id="banner-settings-btn" class="text-link">Gemini API Key</button>.
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1>Grade<span>AI</span></h1>
+      </div>
+      <p class="tagline">Multimodal Exam Grading, OCR & Feedback Dashboard</p>
+      <div class="header-actions">
+        <button id="settings-btn" class="icon-button" aria-label="API Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="main-layout">
+      
+      <!-- Setup Panel (Left) -->
+      <section class="setup-panel glass-card">
+        <h2 class="panel-title">1. Setup Evaluation</h2>
+        
+        <!-- Subject Selection -->
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <div class="subject-selector">
+            <input type="radio" name="subject" id="sub-math" value="Math" checked>
+            <label for="sub-math" class="subject-card">
+              <span class="subject-icon">∑</span>
+              <span class="subject-name">Math</span>
+            </label>
+            
+            <input type="radio" name="subject" id="sub-science" value="Science">
+            <label for="sub-science" class="subject-card">
+              <span class="subject-icon">⚛</span>
+              <span class="subject-name">Science</span>
+            </label>
+            
+            <input type="radio" name="subject" id="sub-social" value="Social">
+            <label for="sub-social" class="subject-card">
+              <span class="subject-icon">🌍</span>
+              <span class="subject-name">Social</span>
+            </label>
+            
+            <input type="radio" name="subject" id="sub-english" value="English">
+            <label for="sub-english" class="subject-card">
+              <span class="subject-icon">✍</span>
+              <span class="subject-name">English</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Reference Materials -->
+        <div class="form-group">
+          <label class="form-label">Question Paper (PDF/Image)</label>
+          <div class="drop-zone" id="question-paper-zone">
+            <input type="file" id="question-paper-input" accept="image/*,application/pdf" hidden>
+            <div class="drop-zone-content">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              <p class="drop-text">Drag or click to upload</p>
+              <p class="drop-subtext">Supports images & PDFs</p>
+            </div>
+            <div class="file-preview" id="question-paper-preview" hidden></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Teacher's Answer Key (PDF/Image)</label>
+          <div class="drop-zone" id="answer-key-zone">
+            <input type="file" id="answer-key-input" accept="image/*,application/pdf" hidden>
+            <div class="drop-zone-content">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 11 11 13 15 9"/>
+              </svg>
+              <p class="drop-text">Drag or click to upload</p>
+              <p class="drop-subtext">Strict reference document</p>
+            </div>
+            <div class="file-preview" id="answer-key-preview" hidden></div>
+          </div>
+        </div>
+
+        <!-- Optional Keywords -->
+        <div class="form-group">
+          <label class="form-label">Optional Keywords (Target Evaluation Concepts)</label>
+          <div class="keyword-input-wrapper">
+            <input type="text" id="keyword-input" placeholder="Type keyword & press Enter">
+            <button type="button" id="add-keyword-btn" class="btn btn-secondary">Add</button>
+          </div>
+          <div class="keywords-list" id="keywords-list">
+            <!-- Dynamically populated tags -->
+          </div>
+        </div>
+
+        <!-- Student Answer Sheet -->
+        <div class="form-group border-top pt-4">
+          <label class="form-label">Student Name</label>
+          <input type="text" id="student-name-input" placeholder="Enter student name (or let AI auto-detect)" class="text-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Student Answer Sheets (Images/PDFs)</label>
+          <div class="drop-zone highlight-zone" id="student-sheets-zone">
+            <input type="file" id="student-sheets-input" accept="image/*,application/pdf" multiple hidden>
+            <div class="drop-zone-content">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+              <p class="drop-text">Upload Answer Sheets</p>
+              <p class="drop-subtext">You can select multiple pages/files</p>
+            </div>
+            <div class="file-preview-grid" id="student-sheets-preview" hidden></div>
+          </div>
+        </div>
+
+        <!-- Execute Button -->
+        <button id="run-grading-btn" class="btn btn-primary btn-block">
+          <span class="btn-text">Correct Answer Sheets</span>
+          <span class="spinner" hidden></span>
+        </button>
+
+        <!-- Dynamic Loader Stage (hidden by default) -->
+        <div class="grading-loader" id="grading-loader" hidden>
+          <div class="loader-stages">
+            <div class="stage" id="stage-ocr">
+              <div class="stage-indicator"></div>
+              <span>Running OCR & Handwriting Conversion</span>
+            </div>
+            <div class="stage" id="stage-crossref">
+              <div class="stage-indicator"></div>
+              <span>Comparing with Teacher's Answer Key</span>
+            </div>
+            <div class="stage" id="stage-grading">
+              <div class="stage-indicator"></div>
+              <span>Applying Rubric (Steps & Language Quality)</span>
+            </div>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-bar-fill" style="width: 0%"></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Dashboard Results (Right) -->
+      <section class="results-panel">
+        
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+          <div class="metric-card glass-card">
+            <div class="metric-info">
+              <span class="metric-label">Average Marks</span>
+              <span class="metric-value" id="metrics-avg">-</span>
+            </div>
+            <div class="metric-icon val-blue">avg</div>
+          </div>
+          
+          <div class="metric-card glass-card">
+            <div class="metric-info">
+              <span class="metric-label">Pass Rate</span>
+              <span class="metric-value" id="metrics-pass">-</span>
+            </div>
+            <div class="metric-icon val-green">%</div>
+          </div>
+          
+          <div class="metric-card glass-card">
+            <div class="metric-info">
+              <span class="metric-label">Graded Papers</span>
+              <span class="metric-value" id="metrics-count">0</span>
+            </div>
+            <div class="metric-icon val-purple">qty</div>
+          </div>
+        </div>
+
+        <!-- Papers Section -->
+        <div class="papers-list-container glass-card">
+          <div class="section-header">
+            <h2 class="panel-title">Graded Submissions</h2>
+            <div class="filter-actions">
+              <button id="clear-history-btn" class="text-button text-danger">Reset All</button>
+            </div>
+          </div>
+          
+          <div class="papers-grid" id="papers-grid">
+            <!-- Dynamically populated cards -->
+            <div class="empty-state" id="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+                <polyline points="10 9 9 9 8 9"/>
+              </svg>
+              <p>No papers graded yet.</p>
+              <span class="help-text">Try uploading documents or click one of the preset mock items below to view dashboard.</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+      
+    </main>
+  </div>
+
+  <!-- Settings Dialog (API Key Settings) -->
+  <dialog id="settings-dialog" class="settings-dialog glass-card">
+    <div class="dialog-header">
+      <h2>Gemini AI Integration Settings</h2>
+      <button class="close-dialog-btn" id="close-settings-btn">&times;</button>
+    </div>
+    <form method="dialog" class="settings-form">
+      <p class="settings-intro">
+        GradeAI uses the <strong>Gemini 1.5 Flash</strong> model directly in the browser to perform highly accurate handwriting OCR and custom subject-based evaluation.
+      </p>
+      
+      <div class="form-group">
+        <label for="api-key-input" class="form-label">Google Gemini API Key</label>
+        <div class="password-input-container">
+          <input type="password" id="api-key-input" placeholder="AIzaSy..." class="text-input">
+          <button type="button" id="toggle-api-key-btn" class="toggle-visibility-btn">Show</button>
+        </div>
+        <p class="form-help">
+          Your API Key is saved locally in your browser (localStorage) and never uploaded to any third-party server. Get one from the <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio</a> for free.
+        </p>
+      </div>
+
+      <div class="settings-status" id="settings-status">
+        <span class="status-badge state-off">No Key Provided</span>
+      </div>
+
+      <div id="allowed-models-container" style="margin-top: 15px; font-size: 0.8rem; border-top: 1px solid var(--border-glass); padding-top: 12px;" hidden>
+        <span class="form-label" style="margin-bottom: 5px;">Authorized Models</span>
+        <ul id="allowed-models-list" style="padding-left: 18px; color: var(--color-text-muted); display: grid; grid-template-columns: 1fr 1fr; gap: 4px; max-height: 80px; overflow-y: auto;">
+          <!-- Dynamically populated -->
+        </ul>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" id="clear-api-key-btn" class="btn btn-secondary">Clear Key</button>
+        <button type="submit" id="save-settings-btn" class="btn btn-primary">Save Config</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Detailed Report Dialog (Split Screen Viewer) -->
+  <dialog id="report-dialog" class="report-dialog">
+    <div class="report-container">
+      
+      <!-- Report Header -->
+      <div class="report-header">
+        <div class="header-left">
+          <h2 id="report-student-name">Student Name</h2>
+          <div class="meta-badges">
+            <span class="badge" id="report-subject">Math</span>
+            <span class="badge" id="report-date">2026-06-18</span>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="score-summary">
+            <span class="score-label">Score</span>
+            <div class="score-value-container">
+              <span id="report-total-score" class="score-big">16.5</span>
+              <span class="score-divider">/</span>
+              <span id="report-max-score" class="score-max">20</span>
+            </div>
+          </div>
+          <button class="close-report-btn" id="close-report-btn">&times;</button>
+        </div>
+      </div>
+
+      <!-- Split Screen Layout -->
+      <div class="report-layout">
+        
+        <!-- Left Pane: Handwritten Answer Sheet (Dynamic Mock/Upload) -->
+        <div class="pane pane-sheet">
+          <div class="pane-header">
+            <h3>Student Answer Sheet</h3>
+            <span class="pane-subtext">Red marks simulate teacher correction overlays</span>
+          </div>
+          <div class="sheet-viewport" id="sheet-viewport">
+            <!-- Injected handwritten HTML or Base64 uploaded images -->
+          </div>
+        </div>
+
+        <!-- Right Pane: Analysis & Evaluations -->
+        <div class="pane pane-analysis">
+          
+          <!-- Tabs Navigation -->
+          <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="tab-grading">Detailed Grading</button>
+            <button class="tab-btn" data-tab="tab-ocr">Extracted Text (OCR)</button>
+            <button class="tab-btn" data-tab="tab-feedback">Overall Feedback</button>
+          </div>
+
+          <!-- Tab: Grading Breakdown -->
+          <div class="tab-content active" id="tab-grading">
+            <div class="grading-questions-list" id="grading-questions-list">
+              <!-- Dynamically populated question corrections -->
+            </div>
+          </div>
+
+          <!-- Tab: OCR Extracted Text -->
+          <div class="tab-content" id="tab-ocr">
+            <div class="ocr-text-view">
+              <div class="info-alert">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="16" x2="12" y2="12"/>
+                  <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>This text was generated using Gemini's handwriting recognition (OCR) and used as the context for marking.</span>
+              </div>
+              <pre class="ocr-text-box" id="ocr-text-box"></pre>
+            </div>
+          </div>
+
+          <!-- Tab: Overall Feedback & Adjustments -->
+          <div class="tab-content" id="tab-feedback">
+            <div class="overall-feedback-section">
+              <div class="feedback-card">
+                <h4>Teacher Evaluator Summary</h4>
+                <p id="overall-feedback-text"></p>
+              </div>
+
+              <!-- Interactive Marks Adjustments -->
+              <div class="adjustments-card">
+                <h4>Manual Marks Adjustment</h4>
+                <p class="adjustments-desc">As the teacher, you can override the final marks allocated by the AI. This will update reports instantly.</p>
+                <div class="slider-group">
+                  <label for="override-score-slider">Adjusted Score: <strong id="override-score-val">16.5</strong> / <span id="override-max-val">20</span></label>
+                  <input type="range" id="override-score-slider" min="0" max="20" step="0.5" value="16.5" class="marks-slider">
+                </div>
+                <div class="form-group mb-0 mt-3">
+                  <label for="override-comment" class="form-label">Adjustment Reason (Optional)</label>
+                  <textarea id="override-comment" placeholder="Note why you modified this score..." class="text-input" rows="2"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Report Footer Actions -->
+      <div class="report-footer">
+        <button id="export-pdf-btn" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export Report Card
+        </button>
+        <button id="close-report-btn-footer" class="btn btn-primary">Save & Close</button>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- Script Modules -->
+  <script type="module" src="app.js?v=1.0.2"></script>
+</body>
+</html>
