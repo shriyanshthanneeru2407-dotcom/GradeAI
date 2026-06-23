@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Sleek AI-Powered Exam Grader & Evaluator",
   "scripts": {
-    "dev": "npx -y http-server -p 3000"
+    "dev": "npx -y http-server -p 3000 --cors -o"
   },
   "keywords": [
     "ai",
