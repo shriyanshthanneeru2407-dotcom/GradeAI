@@ -1,6 +1,8 @@
 # Custom Rules for GradeAI
 
+- **No Planning Mode**:
+  - Do not create implementation plans (`implementation_plan.md`) or wait for design/feedback approval for any tasks unless the user explicitly requests one. Proceed directly to writing code, proposing edits, and running commands.
+
 - **Automated Testing on "test"**:
-  - Whenever the user inputs the phrase "test", the agent should immediately run automated tests (such as starting a local test runner or using Chrome DevTools if configured) without waiting for further instruction or prompting.
-  - If any test errors, console warnings, or build issues are encountered, the agent must proactively research, patch the code, and re-run tests until the application is fully functional.
-  - While the agent must always propose commands for user approval (due to platform security constraints), it should construct the entire test-patch-verify loop as efficiently as possible.
+  - Whenever the user inputs the phrase "test", the agent must bypass planning and immediately run automated tests (starting the test server or running validation scripts) without waiting for instructions or prompting.
+  - If any test errors, warnings, or bugs are found, the agent should proactively patch the code and re-test until verified, asking only for command execution approvals.
